@@ -1,0 +1,27 @@
+# Q3: Concurrent Time Server Using UDP
+# ========================== SERVER CODE ==========================
+import socket
+import threading
+import time
+
+def client(addr, server):
+    current_time = time.ctime()
+    server.sendto(current_time.encode(), addr)
+
+server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+server.bind(("localhost", 12345))
+
+print("Time Server Started")
+
+while True:
+    data, addr = server.recvfrom(1024)
+    threading.Thread(target=client, args=(addr, server)).start()
+
+# =========================== CLIENT CODE ==========================
+import socket
+
+client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+client.sendto(b"time", ("localhost", 12345))
+
+data, addr = client.recvfrom(1024)
+print("Server Time:", data.decode())
