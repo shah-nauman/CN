@@ -1,0 +1,36 @@
+# Q4: Concurrent File Server Using UDP
+# ========================== SERVER CODE ==========================
+import socket
+import threading
+
+def send_file(server, addr, name):
+    try:
+        data = open(name, "rb").read()
+        server.sendto(data, addr)
+    except:
+        server.sendto(b"File not found", addr)
+
+server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+server.bind(("localhost", 12345))
+
+print("File Server Started")
+
+while True:
+    data, addr = server.recvfrom(1024)
+    name = data.decode()
+    threading.Thread(target=send_file, args=(server, addr, name)).start()
+
+# =========================== CLIENT CODE ==========================
+import socket
+
+client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+name = input("Enter file name: ")
+client.sendto(name.encode(), ("localhost", 12345))
+
+data, addr = client.recvfrom(65535)
+
+print("File Content:")
+print(data.decode())
+
+client.close()
