@@ -1,0 +1,46 @@
+# Q2: Multi-User Chat Server Using TCP
+# ========================== SERVER CODE ==========================
+import socket
+import threading
+
+clients = []
+
+def chat(c):
+    while True:
+        try:
+            msg = c.recv(1024)
+            for x in clients:
+                if x != c:
+                    x.send(msg)
+        except:
+            if c in clients:
+                clients.remove(c)
+            break
+
+server = socket.socket()
+server.bind(("localhost", 12345))
+server.listen()
+
+print("Chat Server Started")
+
+while True:
+    c, addr = server.accept()
+    clients.append(c)
+    threading.Thread(target=chat, args=(c,)).start()
+
+# =========================== CLIENT CODE ==========================
+import socket
+import threading
+
+client = socket.socket()
+client.connect(("localhost", 12345))
+
+def receive():
+    while True:
+        print("\nOther:", client.recv(1024).decode())
+
+threading.Thread(target=receive, daemon=True).start()
+
+while True:
+    msg = input("You: ")
+    client.send(msg.encode())
