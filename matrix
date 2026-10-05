@@ -1,0 +1,56 @@
+# Q7: TCP Client-Server Communication to Identify Matrix Type
+# ========================== SERVER CODE ==========================
+import socket
+
+server = socket.socket()
+server.bind(("localhost", 12345))
+server.listen(1)
+
+client, addr = server.accept()
+
+n = int(client.recv(1024).decode())
+matrix = []
+
+for i in range(n):
+    row = list(map(int, client.recv(1024).decode().split()))
+    matrix.append(row)
+
+upper = lower = True
+
+for i in range(n):
+    for j in range(n):
+        if i > j and matrix[i][j] != 0:
+            upper = False
+        if i < j and matrix[i][j] != 0:
+            lower = False
+
+if all(matrix[i][j] == 0 for i in range(n) for j in range(n) if i != j):
+    result = "Diagonal Matrix"
+elif upper:
+    result = "Upper Triangular Matrix"
+elif lower:
+    result = "Lower Triangular Matrix"
+else:
+    result = "Neither"
+
+client.send(result.encode())
+client.close()
+server.close()
+
+# =========================== CLIENT CODE ==========================
+import socket
+
+client = socket.socket()
+client.connect(("localhost", 12345))
+
+n = int(input("Enter matrix size: "))
+client.send(str(n).encode())
+
+print("Enter matrix:")
+for i in range(n):
+    row = input()
+    client.send(row.encode())
+
+print("Result:", client.recv(1024).decode())
+
+client.close()
