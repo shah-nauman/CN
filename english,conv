@@ -1,0 +1,34 @@
+# Q1: UDP Client-Server Communication for Translating New Generation English
+# ========================== SERVER CODE ==========================
+import socket
+
+server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+server.bind(("localhost", 12345))
+
+data, addr = server.recvfrom(1024)
+word = data.decode()
+
+words = {
+    "u": "you",
+    "ur": "your",
+    "r": "are",
+    "pls": "please",
+    "thx": "thank you"
+}
+
+result = words.get(word, "Word not found")
+server.sendto(result.encode(), addr)
+server.close()
+
+# =========================== CLIENT CODE ==========================
+import socket
+
+client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+word = input("Enter New Generation English: ")
+client.sendto(word.encode(), ("localhost", 12345))
+
+data, addr = client.recvfrom(1024)
+print("Formal English:", data.decode())
+
+client.close()
