@@ -1,0 +1,31 @@
+# Q6: Basic TCP Client-Server Communication
+# ========================== SERVER CODE ==========================
+import socket
+
+server = socket.socket()
+server.bind(("localhost", 12345))
+server.listen(1)
+
+print("Server waiting...")
+client, addr = server.accept()
+
+data = client.recv(1024).decode()
+print("Client:", data)
+
+client.send("Hello from Server".encode())
+
+client.close()
+server.close()
+
+# =========================== CLIENT CODE ==========================
+import socket
+
+client = socket.socket()
+client.connect(("localhost", 12345))
+
+client.send("Hello from Client".encode())
+
+data = client.recv(1024).decode()
+print("Server:", data)
+
+client.close()
