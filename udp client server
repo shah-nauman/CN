@@ -1,0 +1,27 @@
+# Q8: UDP Client-Server Communication using Sockets
+# Python version
+# ========================== SERVER CODE ==========================
+import socket
+
+server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+server.bind(("localhost", 12345))
+
+print("Server waiting...")
+
+data, addr = server.recvfrom(1024)
+print("Client:", data.decode())
+
+server.sendto(b"Hello from Server", addr)
+server.close()
+
+# =========================== CLIENT CODE ==========================
+import socket
+
+client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+client.sendto(b"Hello from Client", ("localhost", 12345))
+
+data, addr = client.recvfrom(1024)
+print("Server:", data.decode())
+
+client.close()
